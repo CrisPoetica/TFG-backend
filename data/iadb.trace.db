@@ -1,0 +1,8 @@
+2025-05-26 12:56:13.060930+02:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Tabla "USERS" ya existe
+Table "USERS" already exists; SQL statement:
+CREATE TABLE users ( id BIGINT AUTO_INCREMENT PRIMARY KEY, username VARCHAR(50) NOT NULL UNIQUE, password VARCHAR(255) NOT NULL, email VARCHAR(100) UNIQUE, roles VARCHAR(100) NOT NULL DEFAULT 'ROLE_USER', first_login BOOLEAN NOT NULL DEFAULT TRUE, created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ) [42101-232]
+2025-05-26 12:57:49.297621+02:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Error de Sintaxis en sentencia SQL "INSERT INTO conversations (user_id) SELECT id FROM users WHERE username='juan' [*]WHERE NOT EXISTS (SELECT 1 FROM conversations WHERE user_id=(SELECT id FROM users WHERE username='juan'))"
+Syntax error in SQL statement "INSERT INTO conversations (user_id) SELECT id FROM users WHERE username='juan' [*]WHERE NOT EXISTS (SELECT 1 FROM conversations WHERE user_id=(SELECT id FROM users WHERE username='juan'))"; SQL statement:
+INSERT INTO conversations (user_id) SELECT id FROM users WHERE username='juan' WHERE NOT EXISTS (SELECT 1 FROM conversations WHERE user_id=(SELECT id FROM users WHERE username='juan')) [42000-232]
