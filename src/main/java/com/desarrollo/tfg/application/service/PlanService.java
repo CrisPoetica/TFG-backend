@@ -31,7 +31,7 @@ public class PlanService {
   private final TaskRepository taskRepo;
   private final AiService aiService;
   private final UserService userService;
-  private final ConversationRepository convRepo;      // <-- nuevo
+  private final ConversationRepository convRepo;
   private final MessageRepository msgRepo;
 
   @Transactional
