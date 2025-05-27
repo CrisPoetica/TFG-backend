@@ -38,7 +38,7 @@ public class PlanService {
   public PlanResponse createPlan(LocalDate weekStart) {
     Long userId = userService.getCurrentUser().getId();
 
-    // 1) Verificar no duplicar
+    // 1) Verificar no duplicar minor
     if (planRepo.findByUserIdAndWeekStart(userId, weekStart).isPresent()) {
       throw new RuntimeException("Ya existe un plan para esa semana");
     }
