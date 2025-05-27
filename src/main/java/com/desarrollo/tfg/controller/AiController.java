@@ -23,13 +23,11 @@ public class AiController {
   private final UserService userService;
 
   @PostMapping("/conversations")
-  public ConversationResponse startConversation(Authentication auth) {
-
+  @ResponseStatus(HttpStatus.CREATED)
+  public ConversationResponse startConversation() {
     UserResponse current = userService.getCurrentUser();
-    Long userId = current.getId();
-
     Conversation conv = Conversation.builder()
-      .userId(userId)
+      .userId(current.getId())
       .startedAt(LocalDateTime.now())
       .build();
     conv = convRepo.save(conv);
@@ -40,17 +38,38 @@ public class AiController {
       .build();
   }
 
-  @PostMapping("/conversations/{id}/messages")
-  @ResponseStatus(HttpStatus.OK)
-  public MessageResponse sendMessage(@PathVariable Long id, @RequestBody MessageRequest req, Authentication auth) {
-    // Verificar propiedad de la conversación usando UserService
+  @GetMapping("/conversations/{id}")
+  public ConversationResponse getConversation(@PathVariable Long id) {
     UserResponse current = userService.getCurrentUser();
-    Long userId = current.getId();
-
-    Conversation conv = convRepo.findByIdAndUserId(id, userId)
+    Conversation conv = convRepo.findByIdAndUserId(id, current.getId())
       .orElseThrow(() -> new RuntimeException("Conversation no encontrada o no autorizada"));
 
-    // Guardar mensaje de usuario
+    List<MessageResponse> history = msgRepo.findAllByConversationIdOrderBySentAtAsc(id)
+      .stream()
+      .map(m -> MessageResponse.builder()
+        .id(m.getId())
+        .sender(m.getSender())
+        .content(m.getContent())
+        .sentAt(m.getSentAt())
+        .build())
+      .collect(Collectors.toList());
+
+    return ConversationResponse.builder()
+      .id(conv.getId())
+      .startedAt(conv.getStartedAt())
+      .messages(history)
+      .build();
+  }
+
+  @PostMapping("/conversations/{id}/messages")
+  @ResponseStatus(HttpStatus.OK)
+  public MessageResponse sendMessage(
+    @PathVariable Long id,
+    @RequestBody MessageRequest req) {
+    UserResponse current = userService.getCurrentUser();
+    Conversation conv = convRepo.findByIdAndUserId(id, current.getId())
+      .orElseThrow(() -> new RuntimeException("Conversation no encontrada o no autorizada"));
+
     Message userMsg = Message.builder()
       .conversation(conv)
       .sender("USER")
@@ -59,10 +78,8 @@ public class AiController {
       .build();
     msgRepo.save(userMsg);
 
-    // Obtener respuesta (mock)
     String aiReply = aiService.ask(req.getContent());
 
-    // Guardar mensaje de IA
     Message aiMsg = Message.builder()
       .conversation(conv)
       .sender("AI")

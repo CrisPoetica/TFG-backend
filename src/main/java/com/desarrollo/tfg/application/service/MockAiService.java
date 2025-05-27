@@ -4,6 +4,7 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
 @Service
+@Profile("mock")
 public class MockAiService implements AiService {
   @Override
   public String ask(String prompt) {
