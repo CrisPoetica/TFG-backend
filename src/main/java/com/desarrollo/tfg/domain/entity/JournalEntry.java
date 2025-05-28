@@ -28,4 +28,18 @@ public class JournalEntry {
 
   @Column(name = "created_at", nullable = false)
   private LocalDateTime createdAt;
+
+  @PrePersist
+  public void prePersist() {
+    if (this.entryDate == null) {
+      this.entryDate = LocalDate.now();
+    }
+  }
+
+  @PreUpdate
+  public void preUpdate() {
+    if (this.entryDate == null) {
+      this.entryDate = LocalDate.now();
+    }
+  }
 }
