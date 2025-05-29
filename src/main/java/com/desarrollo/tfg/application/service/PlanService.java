@@ -39,9 +39,9 @@ public class PlanService {
     Long userId = userService.getCurrentUser().getId();
 
     // 1) Verificar no duplicar minor
-    if (planRepo.findByUserIdAndWeekStart(userId, weekStart).isPresent()) {
+ /*   if (planRepo.findByUserIdAndWeekStart(userId, weekStart).isPresent()) {
       throw new RuntimeException("Ya existe un plan para esa semana");
-    }
+    }*/
 
     // 2) Invocar IA: pasamos el contexto
     String prompt = buildWeeklyPrompt(userId, weekStart);

@@ -70,6 +70,19 @@ CREATE TABLE IF NOT EXISTS goals (
     FOREIGN KEY (user_id) REFERENCES users(id)
 );
 
+-- 6. Seguimiento de ánimo
+CREATE TABLE IF NOT EXISTS mood_entries (
+    id          BIGINT AUTO_INCREMENT PRIMARY KEY,
+    user_id     BIGINT NOT NULL,
+    entry_date  DATE    NOT NULL,
+    mood        VARCHAR(20) NOT NULL,
+    notes       VARCHAR(1000),
+    created_at  TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at  TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id)
+);
+
+
 -- 5. Diario personal
 CREATE TABLE IF NOT EXISTS journal_entries (
     id         BIGINT AUTO_INCREMENT PRIMARY KEY,

@@ -68,10 +68,11 @@ public class SecurityConfig {
       .csrf(AbstractHttpConfigurer::disable)
       .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
       .authorizeHttpRequests(authz -> authz
-        .requestMatchers("/api/v1/auth/register",
+        .requestMatchers(
+          "/api/v1/auth/register",
           "/api/v1/auth/login",
-          "/h2-console/**")
-        .permitAll()
+          "/h2-console/**"
+        ).permitAll()
         .anyRequest().authenticated()
       )
       .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
