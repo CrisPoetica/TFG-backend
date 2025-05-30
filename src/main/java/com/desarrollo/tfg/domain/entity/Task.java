@@ -18,18 +18,18 @@ public class Task {
   private Long id;
 
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "plan_week_id", nullable = false)
+  @JoinColumn(name = "plan_week_id", nullable = true)
   private PlanWeek planWeek;
 
-  @Column(name = "day_of_week", nullable = false)
+  @Column(name = "day_of_week", nullable = true)
   private String dayOfWeek;    // Ej: "Lunes", "Martes", ...
 
-  @Column(nullable = false)
+  @Column(nullable = true)
   private String description;
 
-  @Column(nullable = false)
+  @Column(nullable = true)
   private String type;         // Ej: "HÁBITO", "META", "OTRO"
 
-  @Column(nullable = false)
+  @Column(nullable = true)
   private boolean completed;
 }

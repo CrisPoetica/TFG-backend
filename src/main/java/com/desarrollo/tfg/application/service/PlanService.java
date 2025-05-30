@@ -88,7 +88,7 @@ public class PlanService {
     Long userId = userService.getCurrentUser().getId();
     LocalDate today = LocalDate.now();
     LocalDate thisMonday = today.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
-    PlanWeek plan = planRepo.findByUserIdAndWeekStart(userId, thisMonday)
+    PlanWeek plan = planRepo.findTopByUserIdAndWeekStartOrderByGeneratedAtDesc(userId, thisMonday)
       .orElseThrow(() -> new RuntimeException("No hay plan para la semana actual"));
 
     List<TaskResponse> tasks = taskRepo

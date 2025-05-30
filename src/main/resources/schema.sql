@@ -11,11 +11,13 @@ CREATE TABLE IF NOT EXISTS users (
 
 -- 2. Conversaciones y mensajes
 CREATE TABLE IF NOT EXISTS conversations (
-    id          BIGINT AUTO_INCREMENT PRIMARY KEY,
-    user_id     BIGINT NOT NULL,
-    started_at  TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  id          BIGINT   AUTO_INCREMENT PRIMARY KEY,
+  user_id     BIGINT   NOT NULL UNIQUE,
+  started_at  TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT fk_conversations_user
     FOREIGN KEY (user_id) REFERENCES users(id)
 );
+
 CREATE TABLE IF NOT EXISTS messages (
     id              BIGINT AUTO_INCREMENT PRIMARY KEY,
     conversation_id BIGINT NOT NULL,
@@ -33,6 +35,7 @@ CREATE TABLE IF NOT EXISTS plan_weeks (
     generated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id)
 );
+
 CREATE TABLE IF NOT EXISTS tasks (
     id            BIGINT AUTO_INCREMENT PRIMARY KEY,
     plan_week_id  BIGINT NOT NULL,
@@ -92,3 +95,17 @@ CREATE TABLE IF NOT EXISTS journal_entries (
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id)
 );
+
+BEGIN TRANSACTION;
+
+-- 2. Eliminar NOT NULL de cada columna
+ALTER TABLE tasks ALTER COLUMN plan_week_id DROP NOT NULL;
+ALTER TABLE tasks ALTER COLUMN day_of_week DROP NOT NULL;
+ALTER TABLE tasks ALTER COLUMN description DROP NOT NULL;
+ALTER TABLE tasks ALTER COLUMN type DROP NOT NULL;
+ALTER TABLE tasks ALTER COLUMN completed DROP NOT NULL;
+
+-- 3. Confirmar cambios
+COMMIT;
+
+

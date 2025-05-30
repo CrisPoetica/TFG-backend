@@ -4,8 +4,8 @@ import lombok.Data;
 
 @Data
 public class TaskRequest {
-  private String dayOfWeek;    // "Lunes", "Martes", ...
+  private String dayOfWeek;
   private String description;
-  private String type;         // "HÁBITO", "META", etc.
+  private String type;
   private Boolean completed;
 }

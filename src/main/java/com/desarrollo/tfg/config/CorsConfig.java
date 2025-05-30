@@ -11,7 +11,7 @@ public class CorsConfig implements WebMvcConfigurer {
     registry
       .addMapping("/**")                   // aplica a todos tus endpoints REST
       .allowedOrigins("http://localhost:5174") // tu frontend
-      .allowedMethods("GET","POST","PUT","DELETE","OPTIONS")
+      .allowedMethods("GET","POST","PUT","PATCH","DELETE","OPTIONS")
       .allowedHeaders("Authorization","Content-Type","*")
       .allowCredentials(true);                 // si usas cookies o auth credentials
   }

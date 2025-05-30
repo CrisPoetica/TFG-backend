@@ -1,10 +1,14 @@
 package com.desarrollo.tfg.application.service;
 
 import com.desarrollo.tfg.application.dto.habits.*;
+import com.desarrollo.tfg.domain.entity.Conversation;
 import com.desarrollo.tfg.domain.entity.Habit;
 import com.desarrollo.tfg.domain.entity.HabitLog;
+import com.desarrollo.tfg.domain.entity.Message;
+import com.desarrollo.tfg.domain.repository.ConversationRepository;
 import com.desarrollo.tfg.domain.repository.HabitLogRepository;
 import com.desarrollo.tfg.domain.repository.HabitRepository;
+import com.desarrollo.tfg.domain.repository.MessageRepository;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.transaction.Transactional;
@@ -22,6 +26,9 @@ public class HabitService {
   private final HabitLogRepository logRepo;
   private final AiService aiService;
   private final UserService userService;
+  private final ConversationRepository convRepo;
+  private final MessageRepository msgRepo;
+
 
   public HabitResponse createHabit(CreateHabitRequest dto) {
     Habit h = Habit.builder()
@@ -97,21 +104,37 @@ public class HabitService {
   public List<HabitResponse> generateHabitsFromAi() {
     Long userId = userService.getCurrentUser().getId();
 
-    // 1) Montar prompt
-    String prompt = """
-      Dada la siguiente conversación y perfil de usuario, genera un JSON array de hábitos \
-      con campos "name" y "description" para mejorar su productividad y bienestar.
-      Devuélvelo estrictamente así:
-      [
-        { "name": "Beber agua", "description": "..." },
-        { "name": "...",    "description": "..." }
-      ]
-      """;
+    // 1) Recupera la última conversación
+    Conversation conv = convRepo
+      .findTopByUserIdOrderByStartedAtDesc(userId)
+      .orElseThrow(() -> new RuntimeException("No hay conversación previa"));
 
-    // 2) Llamada a la IA
-    String aiJson = aiService.ask(prompt);
+    // 2) Recupera todos los mensajes de esa conversación
+    List<Message> history = msgRepo
+      .findAllByConversationIdOrderBySentAtAsc(conv.getId());
 
-    // 3) Parsear JSON a List<ParsedHabit>
+    // 3) Construye el prompt con contexto + instrucción base
+    StringBuilder prompt = new StringBuilder();
+    prompt.append("Contexto de la conversación:\n");
+    for (Message m : history) {
+      prompt.append(m.getSender())
+        .append(": ")
+        .append(m.getContent())
+        .append("\n");
+    }
+    prompt.append("\nAhora, con base en ese contexto, genera un JSON array de hábitos ")
+      .append("con campos \"name\" y \"description\" para mejorar el area del contexto de la conversacion. ")
+      .append("Devuélvelo estrictamente así, los valores que te pongo ahora son solo un ejemplo, debes adaptarlo a la conversación :\n")
+      .append("[\n")
+      .append("  { \"name\": \"Beber agua\", \"description\": \"...\" },\n")
+      .append("  { \"name\": \"...\", \"description\": \"...\" }\n")
+      .append("]\n")
+      .append("**Solo el JSON**, sin explicaciones.");
+
+    // 4) Llamada a la IA
+    String aiJson = aiService.ask(prompt.toString());
+
+    // 5) Parsear JSON a List<ParsedHabit>
     List<ParsedHabit> parsed;
     try {
       parsed = new ObjectMapper()
@@ -120,7 +143,7 @@ public class HabitService {
       throw new RuntimeException("Error parseando IA: " + ex.getMessage(), ex);
     }
 
-    // 4) Guardar cada hábito
+    // 6) Guardar cada hábito en la BD
     List<HabitResponse> result = new ArrayList<>();
     for (ParsedHabit ph : parsed) {
       Habit h = Habit.builder()
@@ -136,6 +159,7 @@ public class HabitService {
         .createdAt(h.getCreatedAt())
         .build());
     }
+
     return result;
   }
 }

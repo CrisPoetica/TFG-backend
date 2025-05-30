@@ -10,4 +10,7 @@ public interface PlanWeekRepository extends JpaRepository<PlanWeek, Long> {
   Optional<PlanWeek> findByUserIdAndWeekStart(Long userId, LocalDate weekStart);
   Optional<PlanWeek> findTopByUserIdOrderByWeekStartDesc(Long userId);
 
+  Optional<PlanWeek> findTopByUserIdAndWeekStartOrderByGeneratedAtDesc(Long userId, LocalDate weekStart);
+
+
 }
