@@ -31,13 +31,18 @@ public class HabitService {
 
 
   public HabitResponse createHabit(CreateHabitRequest dto) {
-    Habit h = Habit.builder()
+    Habit habito = Habit.builder()
+
       .userId(userService.getCurrentUser().getId())
+
       .name(dto.getName())
       .description(dto.getDescription())
+
       .build();
-    h = habitRepo.save(h);
-    return toResponse(h);
+
+    habito = habitRepo.save(habito);
+
+    return toResponse(habito);
   }
 
   public List<HabitResponse> listHabits() {

@@ -21,7 +21,7 @@ CREATE TABLE IF NOT EXISTS conversations (
 CREATE TABLE IF NOT EXISTS messages (
     id              BIGINT AUTO_INCREMENT PRIMARY KEY,
     conversation_id BIGINT NOT NULL,
-    sender          VARCHAR(10) NOT NULL, -- 'USER' o 'AI'
+    sender          VARCHAR(10) NOT NULL,
     content         CLOB    NOT NULL,
     sent_at         TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (conversation_id) REFERENCES conversations(id)
@@ -39,9 +39,9 @@ CREATE TABLE IF NOT EXISTS plan_weeks (
 CREATE TABLE IF NOT EXISTS tasks (
     id            BIGINT AUTO_INCREMENT PRIMARY KEY,
     plan_week_id  BIGINT NOT NULL,
-    day_of_week   VARCHAR(10) NOT NULL,   -- 'Lunes', 'Martes',...
+    day_of_week   VARCHAR(10) NOT NULL,
     description   VARCHAR(255) NOT NULL,
-    type          VARCHAR(20)  NOT NULL,  -- 'HÁBITO','META','OTRO'
+    type          VARCHAR(20)  NOT NULL,
     completed     BOOLEAN      NOT NULL DEFAULT FALSE,
     FOREIGN KEY (plan_week_id) REFERENCES plan_weeks(id)
 );
@@ -68,7 +68,7 @@ CREATE TABLE IF NOT EXISTS goals (
     user_id     BIGINT NOT NULL,
     title       VARCHAR(150) NOT NULL,
     description TEXT,
-    status      VARCHAR(20)   NOT NULL DEFAULT 'PENDING', -- 'PENDING','IN_PROGRESS','DONE'
+    status      VARCHAR(20)   NOT NULL DEFAULT 'PENDING',
     created_at  TIMESTAMP     NOT NULL DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id)
 );
